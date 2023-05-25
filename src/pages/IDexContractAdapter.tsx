@@ -24,13 +24,15 @@ class DexContractAdapter implements IDexContractAdapter {
     paramsProvider: ContractParamsProvider,
     amount: number
   ): Promise<string> {
+
     const result = await this.contract.functions
       .change_eth_to_usd((await paramsProvider.getPayloadData()) as number[])
       .callParams({ forward: { amount: amount * 10 ** 9 } })
       .addContracts([
+        // @ts-ignore
         TokenAbi__factory.connect(
           "0x6cb020a8d81d9394b9b3c70e0994b33835d43dd8069b0e427be574a2ee3c3437",
-          this.contract.wallet!
+          this.contract.provider
         ),
       ])
       .txParams({

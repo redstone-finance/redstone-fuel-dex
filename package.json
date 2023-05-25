@@ -1,5 +1,5 @@
 {
-  "name": "redstone-showroom",
+  "name": "redstone-fuel-dex",
   "private": true,
   "version": "0.0.1",
   "scripts": {
@@ -9,14 +9,22 @@
     "build": "yarn fix && parcel build index.html"
   },
   "dependencies": {
-    "@fuel-wallet/sdk": "^0.7.2",
-    "@redstone-finance/fuel-connector": "0.2.1",
+    "@fuel-wallet/sdk": "^0.9.2",
+    "@redstone-finance/fuel-connector": "^0.2.2",
     "axios": "^1.2.2",
     "ethers": "^5.6.9",
     "graphql-request": "5.1.0",
     "parcel": "^2.8.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "alias": {
+    "@fuel-ts/transactions/configs": "@fuel-ts/transactions/dist/configs",
+    "@fuel-ts/math/configs": "@fuel-ts/math/dist/configs",
+    "@fuel-ts/program/configs": "@fuel-ts/program/dist/configs",
+    "@fuel-ts/wallet/configs": "@fuel-ts/wallet/dist/configs",
+    "@fuel-ts/address/configs": "@fuel-ts/address/dist/configs",
+    "process": false
   },
   "devDependencies": {
     "@types/react": "^18.0.15",
@@ -46,8 +54,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "alias": {
-    "process": false
   }
 }

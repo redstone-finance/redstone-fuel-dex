@@ -1,13 +1,13 @@
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { Showroom } from "./pages/Showroom";
+import { Dex } from "./pages/Dex";
 
 const App = () => {
   return (
     <div className="flex flex-col h-full bg-neutral-100 overflow-auto">
       <Header />
       <div className="mb-5">
-        <Showroom />
+        <Dex />
       </div>
       <Footer />
     </div>

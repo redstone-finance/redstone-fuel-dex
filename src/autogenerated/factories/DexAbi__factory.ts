@@ -4,13 +4,13 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.31.0
-  Forc version: 0.32.2
-  Fuel-Core version: 0.17.1
+  Fuels version: 0.42.0
+  Forc version: 0.35.5
+  Fuel-Core version: 0.17.3
 */
 
 import { Interface, Contract } from "fuels";
-import type { Provider, BaseWalletLocked, AbstractAddress } from "fuels";
+import type { Provider, Account, AbstractAddress } from "fuels";
 import type { DexAbi, DexAbiInterface } from "../DexAbi";
 
 const _abi = {
@@ -152,15 +152,15 @@ const _abi = {
       },
       "attributes": [
         {
-          "name": "payable",
-          "arguments": []
-        },
-        {
           "name": "storage",
           "arguments": [
             "read",
             "write"
           ]
+        },
+        {
+          "name": "payable",
+          "arguments": []
         }
       ]
     },
@@ -446,8 +446,8 @@ export class DexAbi__factory {
   }
   static connect(
     id: string | AbstractAddress,
-    walletOrProvider: BaseWalletLocked | Provider
+    accountOrProvider: Account | Provider
   ): DexAbi {
-    return new Contract(id, _abi, walletOrProvider) as unknown as DexAbi
+    return new Contract(id, _abi, accountOrProvider) as unknown as DexAbi
   }
 }

@@ -4,19 +4,19 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.31.0
-  Forc version: 0.32.2
-  Fuel-Core version: 0.17.1
+  Fuels version: 0.42.0
+  Forc version: 0.35.5
+  Fuel-Core version: 0.17.3
 */
 
 import type {
-  Interface,
-  FunctionFragment,
-  DecodedValue,
-  Contract,
-  BytesLike,
   BigNumberish,
-  InvokeFunction
+  BytesLike,
+  Contract,
+  DecodedValue,
+  FunctionFragment,
+  Interface,
+  InvokeFunction,
 } from 'fuels';
 
 import type { Enum } from "./common";

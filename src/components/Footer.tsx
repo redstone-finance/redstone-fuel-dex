@@ -1,6 +1,10 @@
+// @ts-ignore
 import MailLogo from "../assets/mail.svg";
+// @ts-ignore
 import TwitterLogo from "../assets/twitter.svg";
+// @ts-ignore
 import GithubLogo from "../assets/github.svg";
+// @ts-ignore
 import DiscordLogo from "../assets/discord.svg";
 
 export const Footer = () => {

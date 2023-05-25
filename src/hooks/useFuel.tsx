@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { Provider, Wallet, WalletLocked, WalletUnlocked } from "fuels";
 import { FuelWalletLocked } from "@fuel-wallet/sdk";
 
+export interface Amounts {
+  [key: string]: number;
+}
+
 export const useFuel = () => {
   const [fuel, setFuel] = useState<Window["fuel"]>();
   const [wallet, setWallet] = useState<
@@ -26,7 +30,7 @@ export const useFuel = () => {
     };
   }, []);
 
-  const changePrivateKey = async (e: any) => {
+  const usePrivateKey = async (e: any) => {
     const provider = new Provider("https://beta-3.fuel.network/graphql");
     let newWallet = undefined;
 
@@ -37,7 +41,8 @@ export const useFuel = () => {
     if (newWallet && newWallet.address) {
       setWalletAddress(newWallet.address.toString());
     }
-    setWallet(newWallet);
+
+    return setWallet(newWallet);
   };
 
   const connectWallet = async (): Promise<unknown> => {
@@ -104,6 +109,6 @@ export const useFuel = () => {
     wallet,
     connectWallet,
     walletAddress,
-    changePrivateKey,
+    usePrivateKey: usePrivateKey,
   };
 };
