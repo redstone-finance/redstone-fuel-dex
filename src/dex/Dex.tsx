@@ -1,5 +1,5 @@
 // @ts-ignore
-import FuelLogo from "../assets/chains/fuel.svg";
+import FuelLogo from "../assets/fuel.svg";
 import { FUEL_NETWORK_NAME } from "../config/constants";
 import { useFuel } from "../hooks/useFuel";
 import { DexBlock } from "./DexBlock";

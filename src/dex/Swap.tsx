@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { formatAmount } from "../utils";
+import { AmountInput } from "../components/AmountInput";
+import EthIcon from "../assets/eth.svg";
+import RedstoneIcon from "../assets/redstone-icon.svg";
+import ArrowDownward from "../assets/arrow-downward.svg";
 
 interface Props {
   props: {
@@ -64,18 +67,23 @@ export function Swap({ props }: Props) {
   }, [changer.current]);
 
   return (
-    <div className="flex justify-center items-center flex-col mb-8">
-      <input
-        type="text"
-        value={formatAmount(ethAmount)}
-        className="bg-redstone bg-opacity-60 hover:opacity-75 text-white py-3 px-8 rounded-full text-xl text-right"
-        onInput={(e) => setEthAmount(e.target.value)}
+    <div className="flex justify-center items-center flex-col mb-4">
+      <AmountInput
+        icon={EthIcon}
+        amount={ethAmount}
+        onInput={setEthAmount}
+        className=""
       />
-      <input
-        type="text"
-        value={formatAmount(tokenAmount)}
-        className="bg-redstone bg-opacity-60 hover:opacity-75 text-white py-3 px-8 rounded-full text-xl  mt-4 text-right"
-        onInput={(e) => setTokenAmount(e.target.value)}
+      <img
+        src={ArrowDownward}
+        className="w-8 h-8 rounded bg-gray-200 relative bottom-2 border-redstone ring-gray-200 ring-1 z-10"
+        alt="Arrow"
+      />
+      <AmountInput
+        className="relative bottom-4"
+        icon={RedstoneIcon}
+        amount={tokenAmount}
+        onInput={setTokenAmount}
       />
     </div>
   );

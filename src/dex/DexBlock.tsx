@@ -23,8 +23,6 @@ import { ChainDataTable } from "../components/ChainDataTable";
 import { Amounts } from "../hooks/useFuel";
 import { Swap } from "./Swap";
 
-// type AssetId = "ETH" | typeof FUEL_TOKEN_ID;
-
 interface Props {
   props: {
     isSelected: boolean;
