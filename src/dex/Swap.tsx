@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { AmountInput } from "../components/AmountInput";
+
+//@ts-ignore
 import EthIcon from "../assets/eth.svg";
+//@ts-ignore
 import RedstoneIcon from "../assets/redstone-icon.svg";
+//@ts-ignore
 import ArrowDownward from "../assets/arrow-downward.svg";
 
 interface Props {

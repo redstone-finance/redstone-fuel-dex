@@ -5,23 +5,22 @@ import { useMockLoader } from "../hooks/useMockLoader";
 import { useRedstoneContract } from "../hooks/useRedstoneContract";
 import {
   FUEL_ADDRESS_EXPLORER_URL,
+  FUEL_ASSET_DENOMINATOR,
   FUEL_DEX_CONTRACT_ID,
   FUEL_DEX_CONTRACT_OWNER,
-  FUEL_TX_EXPLORER_URL,
   FUEL_TOKEN_ID,
+  FUEL_TX_EXPLORER_URL,
 } from "../config/constants";
 import { ChangeEventHandler, useEffect, useState } from "react";
 import Modal from "../components/Modal";
 import { WalletLocked, WalletUnlocked } from "fuels";
-import {
-  DexContractConnector,
-  IDexContractAdapter,
-} from "./IDexContractAdapter";
+import { DexContractAdapter } from "./DexContractAdapter";
 import { ExchangeButton } from "../components/ExchangeButton";
 import { paramsProvider } from "./params_provider";
 import { ChainDataTable } from "../components/ChainDataTable";
 import { Amounts } from "../hooks/useFuel";
 import { Swap } from "./Swap";
+import { DexContractConnector } from "./DexContractConnector";
 
 interface Props {
   props: {
@@ -45,9 +44,9 @@ export const DexBlock = ({ props }: Props) => {
   const { isLoading, performContractAction, errorMessage, setErrorMessage } =
     useRedstoneContract(connector, startMockLoader, setIsMockLoading);
 
-  const changeEthToUsd = async () => {
-    await performContractAction(async (adapter: IDexContractAdapter) => {
-      const txHash = await adapter.changeEthToUsd(paramsProvider, ethAmount);
+  const changeEthToToken = async () => {
+    await performContractAction(async (adapter: DexContractAdapter) => {
+      const txHash = await adapter.changeEthToToken(paramsProvider, ethAmount);
 
       setTxHash(txHash);
       await updateAmounts();
@@ -55,7 +54,7 @@ export const DexBlock = ({ props }: Props) => {
   };
 
   const withdrawFunds = async () => {
-    await performContractAction(async (adapter: IDexContractAdapter) => {
+    await performContractAction(async (adapter: DexContractAdapter) => {
       const txHash = await adapter.withdrawFunds();
 
       setTxHash(txHash);
@@ -64,9 +63,9 @@ export const DexBlock = ({ props }: Props) => {
   };
 
   const getEthPrice = async () => {
-    return await performContractAction(async (adapter: IDexContractAdapter) => {
+    return (await performContractAction(async (adapter: DexContractAdapter) => {
       return await adapter.getEthPrice(paramsProvider);
-    });
+    })) as number;
   };
 
   const ethAmountChanged = (ethAmount: number) => {
@@ -76,9 +75,11 @@ export const DexBlock = ({ props }: Props) => {
   const updateAmounts = async () => {
     let amounts: Amounts = {};
     if (wallet) {
-      const ethAmount = (await wallet.getBalance()).toNumber() / 10 ** 9;
+      const ethAmount =
+        (await wallet.getBalance()).toNumber() / FUEL_ASSET_DENOMINATOR;
       const tokenAmount =
-        (await wallet.getBalance(FUEL_TOKEN_ID)).toNumber() / 10 ** 9;
+        (await wallet.getBalance(FUEL_TOKEN_ID)).toNumber() /
+        FUEL_ASSET_DENOMINATOR;
       amounts["ETH"] = ethAmount;
       amounts[FUEL_TOKEN_ID] = tokenAmount;
     }
@@ -145,13 +146,14 @@ export const DexBlock = ({ props }: Props) => {
         <GetPriceLoader text={isMockLoading ? text : ""} />
       ) : (
         [
-          <div className="flex gap-3">
-            {walletAddress == FUEL_DEX_CONTRACT_OWNER && (
-              <WithdrawFundsButton onClick={withdrawFunds} />
-            )}
-            <ExchangeButton onClick={changeEthToUsd} />
-          </div>,
-
+          isSelected && amounts && (
+            <div className="flex gap-3">
+              {walletAddress == FUEL_DEX_CONTRACT_OWNER && (
+                <WithdrawFundsButton onClick={withdrawFunds} />
+              )}
+              <ExchangeButton onClick={changeEthToToken} />
+            </div>
+          ),
           <div className="px-6 py-3 text-sm w-3/5 text-center text-gray-500">
             <i>
               To <b>interact with the contract</b> you should have <b>ETH</b> be
