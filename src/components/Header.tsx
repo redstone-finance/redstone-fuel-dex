@@ -1,3 +1,4 @@
+// @ts-ignore
 import RedStoneLogo from "../assets/redstone-logo.svg";
 
 export const Header = () => (

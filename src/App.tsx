@@ -1,6 +1,6 @@
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { Dex } from "./pages/Dex";
+import { Dex } from "./dex/Dex";
 
 const App = () => {
   return (

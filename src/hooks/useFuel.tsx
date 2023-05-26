@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Provider, Wallet, WalletLocked, WalletUnlocked } from "fuels";
 import { FuelWalletLocked } from "@fuel-wallet/sdk";
+import { FUEL_RPC_URL } from "../config/constants";
 
 export interface Amounts {
   [key: string]: number;
@@ -31,7 +32,7 @@ export const useFuel = () => {
   }, []);
 
   const usePrivateKey = async (e: any) => {
-    const provider = new Provider("https://beta-3.fuel.network/graphql");
+    const provider = new Provider(FUEL_RPC_URL);
     let newWallet = undefined;
 
     try {

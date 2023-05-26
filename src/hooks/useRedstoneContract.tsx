@@ -2,36 +2,36 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { IContractConnector } from "redstone-sdk";
 import { IDexContractAdapter } from "./IDexContractAdapter";
 
-
 export const useRedstoneContract = (
   connector: IContractConnector<IDexContractAdapter>,
   startMockLoader: () => void,
-  setIsMockLoading: Dispatch<SetStateAction<boolean>>,
+  setIsMockLoading: Dispatch<SetStateAction<boolean>>
 ) => {
-
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const performContractAction = async (
-    callback: (adapter: IDexContractAdapter) => void
+    callback: (adapter: IDexContractAdapter) => unknown
   ) => {
-      try {
-        startMockLoader();
-        setIsLoading(true);
+    try {
+      startMockLoader();
+      setIsLoading(true);
 
-        const adapter = await connector.getAdapter();
+      const adapter = await connector.getAdapter();
 
-        if (adapter) {
-          await callback(adapter);
-          setIsMockLoading(false);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error(error);
-        handleError();
+      if (adapter) {
+        const value = await callback(adapter);
         setIsMockLoading(false);
         setIsLoading(false);
+
+        return value;
       }
+    } catch (error) {
+      console.error(error);
+      handleError();
+      setIsMockLoading(false);
+      setIsLoading(false);
+    }
   };
 
   const handleError = () => {
@@ -46,6 +46,6 @@ export const useRedstoneContract = (
     isLoading,
     errorMessage,
     setErrorMessage,
-    performContractAction
+    performContractAction,
   };
 };

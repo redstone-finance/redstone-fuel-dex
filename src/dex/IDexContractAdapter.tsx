@@ -15,16 +15,24 @@ export interface IDexContractAdapter {
   ): Promise<string>;
 
   withdrawFunds(): Promise<string>;
+  getEthPrice(paramsProvider: ContractParamsProvider): Promise<number>;
 }
 
 class DexContractAdapter implements IDexContractAdapter {
   constructor(protected contract: DexContract, private gasLimit: number) {}
 
+  async getEthPrice(paramsProvider: ContractParamsProvider): Promise<number> {
+    const result = await this.contract.functions
+      .get_eth_price((await paramsProvider.getPayloadData()) as number[])
+      .get();
+
+    return result.value.d.toNumber() / 10 ** 8;
+  }
+
   async changeEthToUsd(
     paramsProvider: ContractParamsProvider,
     amount: number
   ): Promise<string> {
-
     const result = await this.contract.functions
       .change_eth_to_usd((await paramsProvider.getPayloadData()) as number[])
       .callParams({ forward: { amount: amount * 10 ** 9 } })

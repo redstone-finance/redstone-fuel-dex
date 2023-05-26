@@ -1,5 +1,5 @@
 import { GetPriceLoader } from "../components/GetPriceLoader";
-import { WithdrawFunds } from "../components/WithdrawFunds";
+import { WithdrawFundsButton } from "../components/WithdrawFundsButton";
 import { ChainTx } from "../components/ChainTx";
 import { useMockLoader } from "../hooks/useMockLoader";
 import { useRedstoneContract } from "../hooks/useRedstoneContract";
@@ -21,6 +21,7 @@ import { ExchangeButton } from "../components/ExchangeButton";
 import { paramsProvider } from "./params_provider";
 import { ChainDataTable } from "../components/ChainDataTable";
 import { Amounts } from "../hooks/useFuel";
+import { Swap } from "./Swap";
 
 // type AssetId = "ETH" | typeof FUEL_TOKEN_ID;
 
@@ -36,6 +37,7 @@ interface Props {
 export const DexBlock = ({ props }: Props) => {
   const [txHash, setTxHash] = useState("");
   const [amounts, setAmounts] = useState<Amounts | null>(null);
+  const [ethAmount, setEthAmount] = useState(0);
 
   const { isSelected, walletAddress, wallet, usePrivateKey } = props;
   const { text, isMockLoading, setIsMockLoading, startMockLoader } =
@@ -47,7 +49,7 @@ export const DexBlock = ({ props }: Props) => {
 
   const changeEthToUsd = async () => {
     await performContractAction(async (adapter: IDexContractAdapter) => {
-      const txHash = await adapter.changeEthToUsd(paramsProvider, 0.001);
+      const txHash = await adapter.changeEthToUsd(paramsProvider, ethAmount);
 
       setTxHash(txHash);
       await updateAmounts();
@@ -61,6 +63,16 @@ export const DexBlock = ({ props }: Props) => {
       setTxHash(txHash);
       await updateAmounts();
     });
+  };
+
+  const getEthPrice = async () => {
+    return await performContractAction(async (adapter: IDexContractAdapter) => {
+      return await adapter.getEthPrice(paramsProvider);
+    });
+  };
+
+  const ethAmountChanged = (ethAmount: number) => {
+    setEthAmount(ethAmount);
   };
 
   const updateAmounts = async () => {
@@ -117,25 +129,27 @@ export const DexBlock = ({ props }: Props) => {
     </p>
   ) : (
     <div className="flex w-full justify-center items-center mt-8 flex-col">
-      {isSelected && amounts && (
-        <ChainDataTable
-          walletAddress={walletAddress}
-          contractAddress={FUEL_DEX_CONTRACT_ID}
-          addressExplorerUrl={FUEL_ADDRESS_EXPLORER_URL.replace(
-            "{walletAddress}",
-            walletAddress
-          )}
-          walletEthAmount={amounts["ETH"] || 0}
-          walletTokenAmount={amounts[FUEL_TOKEN_ID] || 0}
-        />
-      )}
+      {isSelected &&
+        amounts && [
+          <ChainDataTable
+            walletAddress={walletAddress}
+            contractAddress={FUEL_DEX_CONTRACT_ID}
+            addressExplorerUrl={FUEL_ADDRESS_EXPLORER_URL.replace(
+              "{walletAddress}",
+              walletAddress
+            )}
+            walletEthAmount={amounts["ETH"] || 0}
+            walletTokenAmount={amounts[FUEL_TOKEN_ID] || 0}
+          />,
+          <Swap props={{ priceCallback: getEthPrice, ethAmountChanged }} />,
+        ]}
       {isMockLoading || isLoading ? (
         <GetPriceLoader text={isMockLoading ? text : ""} />
       ) : (
         [
           <div className="flex gap-3">
             {walletAddress == FUEL_DEX_CONTRACT_OWNER && (
-              <WithdrawFunds onClick={withdrawFunds} />
+              <WithdrawFundsButton onClick={withdrawFunds} />
             )}
             <ExchangeButton onClick={changeEthToUsd} />
           </div>,

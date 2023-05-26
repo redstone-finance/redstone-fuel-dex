@@ -2,6 +2,7 @@
 import WalletIcon from "../assets/icons/wallet.png";
 // @ts-ignore
 import ContractIcon from "../assets/icons/contract.png";
+import { formatAmount } from "../utils";
 
 interface Props {
   walletAddress: string;
@@ -27,9 +28,12 @@ export const ChainDataTable = ({
             src={ContractIcon}
             alt="Contract icon"
           />
-          Integrated Contract
+          Integrated&nbsp;Contract
         </td>
-        <td className="py-3 px-3 text-right"> {contractAddress}</td>
+        <td className="py-3 px-3 text-right  hyphens-auto text-sm">
+          {" "}
+          {contractAddress}
+        </td>
       </tr>
       <tr>
         <td className="flex items-center gap-3 py-3 px-3">
@@ -38,9 +42,9 @@ export const ChainDataTable = ({
             src={WalletIcon}
             alt="Wallet icon"
           />
-          Your wallet
+          Your&nbsp;wallet
         </td>
-        <td className="py-3 px-3 text-right underline">
+        <td className="py-3 px-3 text-right underline  hyphens-auto text-sm">
           {" "}
           <a
             href={addressExplorerUrl}
@@ -55,23 +59,13 @@ export const ChainDataTable = ({
       <tr>
         <td className="flex items-center gap-3 py-3 px-3">Amount: </td>
         <td className="py-3 px-3 text-right">
-          <b>
-            {walletEthAmount.toLocaleString("en-us", {
-              minimumFractionDigits: 3,
-            })}
-          </b>{" "}
-          ETHs
+          <b>{formatAmount(walletEthAmount)}</b> ETHs
         </td>
       </tr>
       <tr>
         <td></td>
         <td className="py-3 px-3 text-right">
-          <b>
-            {walletTokenAmount.toLocaleString("en-us", {
-              minimumFractionDigits: 3,
-            })}
-          </b>{" "}
-          Tokens
+          <b>{formatAmount(walletTokenAmount)}</b> Tokens
         </td>
       </tr>
     </tbody>
