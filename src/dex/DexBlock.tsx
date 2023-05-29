@@ -75,12 +75,13 @@ export const DexBlock = ({ props }: Props) => {
   const updateAmounts = async () => {
     let amounts: Amounts = {};
     if (wallet) {
-      const amounts = await Promise.all([
+      const values = await Promise.all([
         wallet.getBalance(),
         wallet.getBalance(FUEL_TOKEN_ID),
       ]);
-      const ethAmount = amounts[0].toNumber() / FUEL_ASSET_DENOMINATOR;
-      const tokenAmount = amounts[1].toNumber() / FUEL_ASSET_DENOMINATOR;
+      console.log(values);
+      const ethAmount = values[0].toNumber() / FUEL_ASSET_DENOMINATOR;
+      const tokenAmount = values[1].toNumber() / FUEL_ASSET_DENOMINATOR;
 
       amounts["ETH"] = ethAmount;
       amounts[FUEL_TOKEN_ID] = tokenAmount;
