@@ -18,7 +18,7 @@ export function AmountInput(props: {
         }
       />
       <img
-        className="h-12 w-12 relative bottom-12 left-60"
+        className="h-8 w-6 relative bottom-10 left-64"
         src={props.icon}
         alt="Icon"
       />

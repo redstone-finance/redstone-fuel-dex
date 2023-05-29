@@ -5,7 +5,7 @@ import ContractIcon from "../assets/icons/contract.png";
 // @ts-ignore
 import EthIcon from "../assets/eth.svg";
 // @ts-ignore
-import RedstoneIcon from "../assets/redstone-icon.svg";
+import UsdIcon from "../assets/dollar.svg";
 import { formatAmount } from "../utils";
 
 interface Props {
@@ -45,16 +45,20 @@ export const ChainDataTable = ({
       </tr>
       <tr>
         <td className="px-3">
-          <span className="font-semibold text-gray-700 w-40 inline-block text-right text-lg">
+          <span className="font-semibold text-gray-700 w-28 h-6 inline-block text-right text-lg">
             {formatAmount(walletEthAmount, true)}
-            <img className="h-12 w-12 inline" src={EthIcon} alt="ETH Icon" />
+            <img
+              className="h-6 w-6 inline relative align-baseline left-2 top-1"
+              src={EthIcon}
+              alt="ETH Icon"
+            />
           </span>
 
-          <span className="font-semibold text-gray-700 w-40  inline-block  text-right text-lg">
+          <span className="font-semibold text-gray-700 w-48 h6 inline-block  text-right text-lg">
             {formatAmount(walletTokenAmount, true)}
             <img
-              className="h-12 w-12 inline"
-              src={RedstoneIcon}
+              className="h-6 w-6 inline relative align-baseline left-2 top-1"
+              src={UsdIcon}
               alt="ETH Icon"
             />
           </span>

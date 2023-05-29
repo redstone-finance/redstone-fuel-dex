@@ -4,7 +4,7 @@ import { AmountInput } from "../components/AmountInput";
 //@ts-ignore
 import EthIcon from "../assets/eth.svg";
 //@ts-ignore
-import RedstoneIcon from "../assets/redstone-icon.svg";
+import UsdIcon from "../assets/dollar.svg";
 //@ts-ignore
 import ArrowDownward from "../assets/arrow-downward.svg";
 
@@ -85,7 +85,7 @@ export function Swap({ props }: Props) {
       />
       <AmountInput
         className="relative bottom-4"
-        icon={RedstoneIcon}
+        icon={UsdIcon}
         amount={tokenAmount}
         onInput={setTokenAmount}
       />
