@@ -59,7 +59,7 @@ export const ChainDataTable = ({
             <img
               className="h-6 w-6 inline relative align-baseline left-2 top-1"
               src={UsdIcon}
-              alt="ETH Icon"
+              alt="USD Icon"
             />
           </span>
         </td>

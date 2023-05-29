@@ -15,6 +15,9 @@ interface Props {
   };
 }
 
+const ETH_ID = 1;
+const TOKEN_ID = 2;
+
 export function Swap({ props }: Props) {
   const { priceCallback, ethAmountChanged } = props;
 
@@ -23,51 +26,58 @@ export function Swap({ props }: Props) {
 
   const changer = useRef(0);
 
+  function ethFocus() {
+    changer.current = ETH_ID;
+  }
+
+  function tokenFocus() {
+    changer.current = TOKEN_ID;
+  }
+
   useEffect(() => {
     ethAmountChanged(ethAmount);
-    console.log(`E ${changer.current} ${ethAmount}`);
-    if (changer.current >= 1) {
+    if (Math.floor(changer.current) !== ETH_ID || isNaN(ethAmount)) {
       return;
     }
-    changer.current = 1;
+
+    changer.current = ETH_ID + ethAmount / 10 ** 9;
   }, [ethAmount]);
 
   useEffect(() => {
-    console.log(`T ${changer.current} ${tokenAmount}`);
-    if (changer.current >= 1) {
+    if (Math.floor(changer.current) !== TOKEN_ID || isNaN(tokenAmount)) {
       return;
     }
-    changer.current = 2;
+
+    changer.current = TOKEN_ID + tokenAmount / 10 ** 9;
   }, [tokenAmount]);
 
   useEffect(() => {
-    async function calculateTokenAmount() {
-      console.log(`X ${changer.current}`);
-      if (changer.current != 1) {
+    async function calculateAmount(callback: (price: number) => void) {
+      let prevChanger = changer.current;
+      let price = await priceCallback();
+      if (changer.current !== prevChanger) {
         return;
       }
 
-      let price = await priceCallback();
+      callback(price);
+    }
 
-      setTokenAmount(ethAmount * price);
-      changer.current = Math.random();
+    async function calculateTokenAmount() {
+      await calculateAmount((price) => setTokenAmount(ethAmount * price));
     }
 
     async function calculateEthAmount() {
-      console.log(`Y ${changer.current}`);
-      if (changer.current != 2) {
-        return;
-      }
-
-      let price = await priceCallback();
-
-      setEthAmount(tokenAmount / price);
-      changer.current = Math.random();
+      await calculateAmount((price) => setEthAmount(tokenAmount / price));
     }
 
-    console.log(`A ${changer.current}`);
-    calculateTokenAmount();
-    calculateEthAmount();
+    switch (Math.floor(changer.current)) {
+      case ETH_ID:
+        calculateTokenAmount();
+        break;
+      case TOKEN_ID:
+        calculateEthAmount();
+        break;
+    }
   }, [changer.current]);
 
   return (
@@ -76,6 +86,7 @@ export function Swap({ props }: Props) {
         icon={EthIcon}
         amount={ethAmount}
         onInput={setEthAmount}
+        onFocus={ethFocus}
         className=""
       />
       <img
@@ -88,6 +99,7 @@ export function Swap({ props }: Props) {
         icon={UsdIcon}
         amount={tokenAmount}
         onInput={setTokenAmount}
+        onFocus={tokenFocus}
       />
     </div>
   );
