@@ -1,0 +1,14 @@
+[project]
+authors = ["Łukasz Kalbarczyk"]
+entry = "main.sw"
+forc-version = "0.35.0"
+license = "Apache-2.0"
+name = "initializer"
+organization = "RedStone"
+
+[constants]
+DEX_CONTRACT_ID = { type = "b256", value = "0x6d98583228051ce2a14968daad63b7bf22f3edb0af02e75b68da017d037b1412" }
+TOKEN_CONTRACT_ID = { type = "b256", value = "0x6cb020a8d81d9394b9b3c70e0994b33835d43dd8069b0e427be574a2ee3c3437" }
+
+[dependencies]
+common = { path = "../common" }
