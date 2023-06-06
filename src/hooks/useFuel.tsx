@@ -1,11 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Provider, Wallet, WalletLocked, WalletUnlocked } from "fuels";
 import { FuelWalletLocked } from "@fuel-wallet/sdk";
 import { FUEL_RPC_URL } from "../config/constants";
-
-export interface Amounts {
-  [key: string]: number;
-}
 
 export const useFuel = () => {
   const [fuel, setFuel] = useState<Window["fuel"]>();
@@ -31,13 +27,15 @@ export const useFuel = () => {
     };
   }, []);
 
-  const usePrivateKey = async (e: any) => {
+  const usePrivateKey = async (privateKey: string) => {
     const provider = new Provider(FUEL_RPC_URL);
     let newWallet = undefined;
 
     try {
-      newWallet = await Wallet.fromPrivateKey(e.target.value, provider);
-    } catch {}
+      newWallet = await Wallet.fromPrivateKey(privateKey, provider);
+    } catch (e: any) {
+      console.error(e);
+    }
 
     if (newWallet && newWallet.address) {
       setWalletAddress(newWallet.address.toString());
@@ -110,6 +108,6 @@ export const useFuel = () => {
     wallet,
     connectWallet,
     walletAddress,
-    usePrivateKey: usePrivateKey,
+    usePrivateKey,
   };
 };

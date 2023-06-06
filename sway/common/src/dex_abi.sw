@@ -12,9 +12,9 @@ abi Dex {
     #[storage(read)]
     fn get_expected_usd_amount(eth_to_swap: u64, payload: Vec<u64>) -> u64;
 
-    #[storage(read, write), payable]
+    #[storage(read), payable]
     fn change_eth_to_usd(payload: Vec<u64>);
 
-    #[storage(read, write)]
+    #[storage(read)]
     fn withdraw_funds();
 }

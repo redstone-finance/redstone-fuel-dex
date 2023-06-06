@@ -1,5 +1,5 @@
 [project]
-authors = ["Łukasz Kalbarczyk"]
+authors = ["RedStone Finance"]
 entry = "dex.sw"
 forc-version = "0.35.0"
 license = "Apache-2.0"
@@ -8,7 +8,4 @@ organization = "RedStone"
 
 [dependencies]
 common = { path = "../common" }
-redstone = { git = "https://github.com/redstone-finance/redstone-fuel-library", tag = "0.2.1-pre" }
-
-[constants]
-SALT = { type = "b256", value = "0x0000000000000000000000000000000000000000000000000000000000000001" }
+redstone = { git = "https://github.com/redstone-finance/redstone-fuel-sdk", tag = "0.2.1-pre" }

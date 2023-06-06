@@ -35,7 +35,6 @@ storage {
 impl Dex for Contract {
     #[storage(read, write)]
     fn init(usd_contract_id: ContractId, signers: Vec<b256>) {
-        log(SALT); // tech purposes
         assert(storage.owner.is_none() || storage.owner.unwrap() == msg_sender().unwrap());
 
         storage.owner = Option::Some(msg_sender().unwrap());
@@ -59,7 +58,7 @@ impl Dex for Contract {
         get_expected_usd_amount(coins_to_swap, get_signers_from_storage(), payload)
     }
 
-    #[storage(read, write), payable]
+    #[storage(read), payable]
     fn change_eth_to_usd(payload: Vec<u64>) {
         assert(msg_asset_id() == BASE_ASSET_ID);
         assert(storage.usd_contract_id.value != ZERO_B256);
@@ -72,7 +71,7 @@ impl Dex for Contract {
         transfer(usd_amount, storage.usd_contract_id, sender);
     }
 
-    #[storage(read, write)]
+    #[storage(read)]
     fn withdraw_funds() {
         let owner = storage.owner.unwrap();
         assert(msg_sender().unwrap() == owner);
