@@ -1,5 +1,5 @@
 [project]
-authors = ["Łukasz Kalbarczyk"]
+authors = ["RedStone Finance"]
 entry = "lib.sw"
 forc-version = "0.35.0"
 license = "Apache-2.0"

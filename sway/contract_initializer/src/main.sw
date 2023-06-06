@@ -16,5 +16,6 @@ fn main() {
     usd.mint(Identity::ContractId(ContractId {
         value: DEX_CONTRACT_ID,
     }), 500000 * 100_000_000);
-    // dex.withdraw_funds();
+
+    return ();
 }

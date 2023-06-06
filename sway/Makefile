@@ -43,9 +43,7 @@ dex: format
 
 init: format
 	cd $(INITIALIZER) && forc run -r \
-	--data 0x0$(IS_LOCAL) \
 	--node-url $(NODE_URL) \
 	--contract $(DEX_CONTRACT_ID) \
 	--contract $(TOKEN_CONTRACT_ID) \
-	--gas-limit 100000000 \
 	--gas-price $(GAS_PRICE) $(SIGNING_KEY)

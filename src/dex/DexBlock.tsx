@@ -2,7 +2,7 @@ import { GetPriceLoader } from "../components/GetPriceLoader";
 import { WithdrawFundsButton } from "../components/WithdrawFundsButton";
 import { ChainTx } from "../components/ChainTx";
 import { useMockLoader } from "../hooks/useMockLoader";
-import { useRedstoneContract } from "../hooks/useRedstoneContract";
+import { useLoaders } from "../hooks/useLoaders";
 import {
   FUEL_ADDRESS_EXPLORER_URL,
   FUEL_ASSET_DENOMINATOR,
@@ -11,23 +11,21 @@ import {
   FUEL_TOKEN_ID,
   FUEL_TX_EXPLORER_URL,
 } from "../config/constants";
-import { ChangeEventHandler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../components/Modal";
 import { WalletLocked, WalletUnlocked } from "fuels";
-import { DexContractAdapter } from "./DexContractAdapter";
 import { ExchangeButton } from "../components/ExchangeButton";
 import { paramsProvider } from "./params_provider";
 import { ChainDataTable } from "../components/ChainDataTable";
-import { Amounts } from "../hooks/useFuel";
 import { Swap } from "./Swap";
-import { DexContractConnector } from "./DexContractConnector";
+import { DexContractAdapter } from "./DexContractAdapter";
+import { Amounts, BalanceFetcher } from "../scripts/BalanceFetcher";
 
 interface Props {
   props: {
-    isSelected: boolean;
+    adapterPromise: Promise<DexContractAdapter>;
     walletAddress: string;
     wallet: WalletLocked | WalletUnlocked | undefined;
-    usePrivateKey: ChangeEventHandler<HTMLInputElement>;
   };
 }
 
@@ -36,17 +34,18 @@ export const DexBlock = ({ props }: Props) => {
   const [amounts, setAmounts] = useState<Amounts | null>(null);
   const [ethAmount, setEthAmount] = useState(0);
 
-  const { isSelected, walletAddress, wallet, usePrivateKey } = props;
+  const { adapterPromise, walletAddress, wallet } = props;
   const { text, isMockLoading, setIsMockLoading, startMockLoader } =
     useMockLoader();
-  const connector = new DexContractConnector(wallet!, FUEL_DEX_CONTRACT_ID);
 
-  const { isLoading, performContractAction, errorMessage, setErrorMessage } =
-    useRedstoneContract(connector, startMockLoader, setIsMockLoading);
+  const { isLoading, performAction, errorMessage, setErrorMessage } =
+    useLoaders(startMockLoader, setIsMockLoading);
 
   const changeEthToToken = async () => {
-    await performContractAction(async (adapter: DexContractAdapter) => {
-      const txHash = await adapter.changeEthToToken(paramsProvider, ethAmount);
+    await performAction(async () => {
+      const txHash = await (
+        await adapterPromise
+      ).changeEthToToken(paramsProvider, ethAmount);
 
       setTxHash(txHash);
       await updateAmounts();
@@ -54,8 +53,8 @@ export const DexBlock = ({ props }: Props) => {
   };
 
   const withdrawFunds = async () => {
-    await performContractAction(async (adapter: DexContractAdapter) => {
-      const txHash = await adapter.withdrawFunds();
+    await performAction(async () => {
+      const txHash = await (await adapterPromise).withdrawFunds();
 
       setTxHash(txHash);
       await updateAmounts();
@@ -63,8 +62,8 @@ export const DexBlock = ({ props }: Props) => {
   };
 
   const getEthPrice = async () => {
-    return (await performContractAction(async (adapter: DexContractAdapter) => {
-      return await adapter.getEthPrice(paramsProvider);
+    return (await performAction(async () => {
+      return await (await adapterPromise).getEthPrice(paramsProvider);
     })) as number;
   };
 
@@ -73,19 +72,7 @@ export const DexBlock = ({ props }: Props) => {
   };
 
   const updateAmounts = async () => {
-    let amounts: Amounts = {};
-    if (wallet) {
-      const values = await Promise.all([
-        wallet.getBalance(),
-        wallet.getBalance(FUEL_TOKEN_ID),
-      ]);
-      console.log(values);
-      const ethAmount = values[0].toNumber() / FUEL_ASSET_DENOMINATOR;
-      const tokenAmount = values[1].toNumber() / FUEL_ASSET_DENOMINATOR;
-
-      amounts["ETH"] = ethAmount;
-      amounts[FUEL_TOKEN_ID] = tokenAmount;
-    }
+    let amounts = await new BalanceFetcher(wallet).fetchAmounts();
 
     setAmounts(amounts);
   };
@@ -100,39 +87,10 @@ export const DexBlock = ({ props }: Props) => {
     updateAmounts();
   }, [wallet]);
 
-  return !wallet ? (
-    <p className="mt-10 mb-0 text-lg text-center">
-      {!window.fuel && [
-        <b>Please sign in to Fuel</b>,
-        <div className="px-6 py-3 text-sm w-full text-center text-gray-500 mt-8 border">
-          <div className="w-full mb-2">
-            The Fuel Wallet extension you can install from here:{" "}
-            <b>
-              <a
-                target="_blank"
-                href="https://wallet.fuel.network/docs/install/"
-              >
-                https://wallet.fuel.network/docs/install/
-              </a>
-            </b>
-          </div>
-          <div className="w-full mt-2">
-            or pass your fuel-wallet's <b>PRIVATE KEY</b> below: <br />
-            <input
-              className="text-sm w-full align-center gap-2 border mt-1 py-2 px-2 rounded"
-              type="password"
-              name="private_key"
-              id="private_key"
-              onChange={usePrivateKey}
-            />
-          </div>
-        </div>,
-      ]}
-    </p>
-  ) : (
-    <div className="flex w-full justify-center items-center mt-8 flex-col">
-      {isSelected &&
-        amounts && [
+  return (
+    (wallet && (
+      <div className="flex w-full justify-center items-center mt-8 flex-col">
+        {amounts && [
           <ChainDataTable
             walletAddress={walletAddress}
             contractAddress={FUEL_DEX_CONTRACT_ID}
@@ -145,41 +103,42 @@ export const DexBlock = ({ props }: Props) => {
           />,
           <Swap props={{ priceCallback: getEthPrice, ethAmountChanged }} />,
         ]}
-      {isMockLoading || isLoading ? (
-        <GetPriceLoader text={isMockLoading ? text : ""} />
-      ) : (
-        [
-          isSelected && amounts && (
-            <div className="flex gap-3">
-              {walletAddress == FUEL_DEX_CONTRACT_OWNER && (
-                <WithdrawFundsButton onClick={withdrawFunds} />
-              )}
-              <ExchangeButton onClick={changeEthToToken} />
-            </div>
-          ),
-          <div className="px-6 py-3 text-sm w-3/5 text-center text-gray-500">
-            <i>
-              To <b>interact with the contract</b> you should have <b>ETH</b> be
-              added to the wallet <br /> by using{" "}
-              <b>
-                <a target="_blank" href="https://faucet-beta-3.fuel.network/">
-                  https://faucet-beta-3.fuel.network/
-                </a>
-              </b>
-            </i>
-          </div>,
-          isSelected && txHash && (
-            <ChainTx txHash={txHash} txExplorerUrl={FUEL_TX_EXPLORER_URL} />
-          ),
-        ]
-      )}
-      {!!errorMessage && (
-        <Modal
-          closeModal={() => setErrorMessage("")}
-          title="Problem with contract interaction"
-          text={errorMessage}
-        />
-      )}
-    </div>
+        {isMockLoading || isLoading ? (
+          <GetPriceLoader text={isMockLoading ? text : ""} />
+        ) : (
+          [
+            amounts && (
+              <div className="flex gap-3">
+                {walletAddress == FUEL_DEX_CONTRACT_OWNER && (
+                  <WithdrawFundsButton onClick={withdrawFunds} />
+                )}
+                <ExchangeButton onClick={changeEthToToken} />
+              </div>
+            ),
+            <div className="px-6 py-3 text-sm w-3/5 text-center text-gray-500">
+              <i>
+                To <b>interact with the contract</b> you should have <b>ETH</b>{" "}
+                be added to the wallet <br /> by using{" "}
+                <b>
+                  <a target="_blank" href="https://faucet-beta-3.fuel.network/">
+                    https://faucet-beta-3.fuel.network/
+                  </a>
+                </b>
+              </i>
+            </div>,
+            txHash && (
+              <ChainTx txHash={txHash} txExplorerUrl={FUEL_TX_EXPLORER_URL} />
+            ),
+          ]
+        )}
+        {!!errorMessage && (
+          <Modal
+            closeModal={() => setErrorMessage("")}
+            title="Problem with contract interaction"
+            text={errorMessage}
+          />
+        )}
+      </div>
+    )) || <div></div>
   );
 };
